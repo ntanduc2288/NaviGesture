@@ -31,6 +31,9 @@ class MainActivity : AppCompatActivity(), DiscreteSeekBar.OnProgressChangeListen
 
         this.seekBar!!.setOnProgressChangeListener(this)
         this.seekBar!!.progress = Utils.getDetaulScaleValue(this.applicationContext)
+
+        val isEnable = Utils.isAccessibilityServiceEnabled(this@MainActivity, MainActivity::class.java)
+        Toast.makeText(this@MainActivity, "fdsafdsa   " + isEnable, Toast.LENGTH_SHORT).show()
     }
 
     private fun initData() {
