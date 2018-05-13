@@ -12,6 +12,7 @@ interface HomePresenter {
     interface Presenter{
         fun checkEnableAccessibilityService()
         fun scaleChanged(value: Int)
+        fun colorChanged(color: Int)
         fun checkDrawOverlayPermission()
         fun release()
     }

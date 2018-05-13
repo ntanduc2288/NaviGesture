@@ -25,6 +25,19 @@ class Utils{
             editor.commit()
         }
 
+        fun getDetaulColorValue(context: Context): Int{
+            val sharedPreferences = context.getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+            val scaleData = sharedPreferences.getInt(Constants.COLOR, Constants.DEFAULT_COLOR)
+            return scaleData
+        }
+
+        fun saveColorToLocal(context: Context, value: Int){
+            val sharedPreferences = context.getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.putInt(Constants.COLOR, value)
+            editor.commit()
+        }
+
 
         fun isAccessibilitySettingsOn(mContext: Context, serviceClassName: String): Boolean {
             var accessibilityEnabled = 0

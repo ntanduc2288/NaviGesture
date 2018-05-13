@@ -4,6 +4,7 @@ import android.content.Context
 import android.provider.Settings
 import android.widget.Toast
 import com.eightbitlab.rxbus.Bus
+import com.my.navigesture.data.ColorData
 import com.my.navigesture.data.ScaleData
 import com.my.navigesture.data.services.naviService.NaviService
 import com.my.navigesture.utils.Utils
@@ -50,6 +51,11 @@ class HomePresenterImpl: HomePresenter.Presenter{
         }else{
             checkEnableAccessibilityService()
         }
+    }
+
+    override fun colorChanged(color: Int) {
+        Utils.saveColorToLocal(context!!, color)
+        Bus.send(ColorData(color))
     }
 
     override fun release() {

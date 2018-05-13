@@ -3,17 +3,23 @@ package com.my.navigesture.data.services.naviService
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.graphics.PixelFormat
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.ShapeDrawable
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.my.navigesture.*
+import com.my.navigesture.data.ColorData
 import com.my.navigesture.data.services.naviService.TouchListener.FireEvent
 import com.my.navigesture.utils.Constants
 import com.my.navigesture.utils.Utils
@@ -38,7 +44,13 @@ class NaviService: AccessibilityService{
         addOverlayView()
         Bus.observe<ScaleData>()
                 .subscribe{ resizeContainerHeight(it.getScaleDate()) }
-                .registerInBus(this);
+                .registerInBus(this)
+
+        Bus.observe<ColorData>()
+                .subscribe{ Log.d("DUC", "Color: " + it.color)
+                    changeBackgroundColor(it.color)
+                }
+                .registerInBus(this)
     }
 
 
@@ -103,6 +115,17 @@ class NaviService: AccessibilityService{
 
         recent?.setOnTouchListener(TouchListener(recentFireListener))
 
+    }
+
+    private fun changeBackgroundColor(color: Int){
+        for (i in 0 until viewContainer!!.childCount) {
+            val view = viewContainer!!.getChildAt(i)
+            if(view is ImageView){
+                var drawable: GradientDrawable = view.drawable as GradientDrawable
+                drawable.setColor(color)
+
+            }
+        }
     }
 
     private fun resizeContainerHeight(size: Int){

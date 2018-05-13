@@ -45,9 +45,15 @@
             android:textAllCaps="false"
             android:id="@+id/btnOpenAccessibility"
             android:onClick="clickAccessibility"
-            android:text="Open Accessibility"/>
+            android:text="@string/open_accessibility"/>
 
     </LinearLayout>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="@string/customize_the_indicator_s_width"/>
 
     <RelativeLayout
 
@@ -82,5 +88,17 @@
             android:layout_alignParentRight="true"
             android:text="100"/>
     </RelativeLayout>
+
+    <android.support.v7.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#abcabc"
+        android:padding="5dp"
+        android:layout_gravity="right"
+        android:textAllCaps="false"
+        android:id="@+id/btnChooseColor"
+        android:onClick="changeColor"
+        android:text="@string/change_color"/>
+
 
 </LinearLayout>

@@ -1,18 +1,24 @@
 package com.my.navigesture.presentation.home
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
+import com.eightbitlab.rxbus.Bus
+import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
 import com.my.navigesture.R
+import com.my.navigesture.data.ColorData
+import com.my.navigesture.utils.Constants
+import com.my.navigesture.utils.Utils
 import kotlinx.android.synthetic.main.main.*
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
 
-class MainActivity : AppCompatActivity(), DiscreteSeekBar.OnProgressChangeListener, HomePresenter.View {
 
+class MainActivity : AppCompatActivity(), DiscreteSeekBar.OnProgressChangeListener, HomePresenter.View, ColorPickerDialogListener {
     val REQUEST_CODE = 10101
     var presenter: HomePresenter.Presenter? = null
 
@@ -95,6 +101,25 @@ class MainActivity : AppCompatActivity(), DiscreteSeekBar.OnProgressChangeListen
     //Button Open Accessibility
     fun clickAccessibility(view: View) {
         openAccessibility()
+
+    }
+
+    fun changeColor(view: View) {
+        com.jaredrummler.android.colorpicker.ColorPickerDialog.newBuilder()
+                .setDialogType(com.jaredrummler.android.colorpicker.ColorPickerDialog.TYPE_CUSTOM)
+                .setAllowPresets(false)
+                .setDialogId(10)
+                .setColor(Utils.getDetaulColorValue(this@MainActivity))
+                .setShowAlphaSlider(true)
+                .show(this)
+    }
+
+    override fun onDialogDismissed(dialogId: Int) {
+
+    }
+
+    override fun onColorSelected(dialogId: Int, color: Int) {
+        presenter?.colorChanged(color)
     }
 
 
