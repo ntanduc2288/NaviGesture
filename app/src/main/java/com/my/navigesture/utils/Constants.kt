@@ -1,6 +1,4 @@
-package com.my.navigesture
-
-import android.content.SharedPreferences
+package com.my.navigesture.utils
 
 class Constants{
     companion object {

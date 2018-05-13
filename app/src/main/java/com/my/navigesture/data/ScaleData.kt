@@ -1,4 +1,4 @@
-package com.my.navigesture
+package com.my.navigesture.data
 
 class ScaleData{
     private var scaleData: Int = 0

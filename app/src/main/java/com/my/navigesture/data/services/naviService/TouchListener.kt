@@ -1,4 +1,4 @@
-package com.my.navigesture
+package com.my.navigesture.data.services.naviService
 
 import android.view.MotionEvent
 import android.view.View

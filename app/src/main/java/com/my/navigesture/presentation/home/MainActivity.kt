@@ -1,69 +1,56 @@
-package com.my.navigesture
+package com.my.navigesture.presentation.home
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Toast
-import com.eightbitlab.rxbus.Bus
-import io.reactivex.Observable
-import io.reactivex.Observer
-import io.reactivex.Scheduler
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
+import com.my.navigesture.R
 import kotlinx.android.synthetic.main.main.*
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
 
-class MainActivity : AppCompatActivity(), DiscreteSeekBar.OnProgressChangeListener {
+class MainActivity : AppCompatActivity(), DiscreteSeekBar.OnProgressChangeListener, HomePresenter.View {
+
     val REQUEST_CODE = 10101
-    val publishSubject = PublishSubject.create<Int>()
-    val compositSubscription: CompositeDisposable = CompositeDisposable()
+    var presenter: HomePresenter.Presenter? = null
+
+    override fun showScale(value: Int) {
+        this.seekBar!!.progress = value
+    }
+
+    override fun showAccessibilityView() {
+        rlServiceNotRunning.visibility = View.VISIBLE
+    }
+
+    override fun hideAccessibilityView() {
+        rlServiceNotRunning.visibility = View.GONE
+    }
+
+    override fun openAccessibility() {
+        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        startActivity(intent)
+    }
+
+    override fun openOverlaySettings() {
+        var intent: Intent? = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + packageName))
+        startActivityForResult(intent, REQUEST_CODE)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
         initData()
-
-        this.seekBar!!.setOnProgressChangeListener(this)
-        this.seekBar!!.progress = Utils.getDetaulScaleValue(this.applicationContext)
-
-        val isEnable = Utils.isAccessibilityServiceEnabled(this@MainActivity, MainActivity::class.java)
-        Toast.makeText(this@MainActivity, "fdsafdsa   " + isEnable, Toast.LENGTH_SHORT).show()
     }
 
     private fun initData() {
-        if (Settings.canDrawOverlays(this)) {
-            finishActivity()
-        } else {
-            checkDrawOverlayPermission()
-        }
+        presenter = HomePresenterImpl(this@MainActivity, this)
+        presenter?.checkDrawOverlayPermission()
 
-        //Notify scale changed
-        compositSubscription.add(publishSubject.flatMap { getScaleObservable(it) }
-                .subscribeOn(Schedulers.io())
-                .subscribe())
+        this.seekBar!!.setOnProgressChangeListener(this)
 
-    }
-
-    fun getScaleObservable(value: Int): Observable<Int>{
-
-        return Observable.just(value)
-                .doOnNext { Bus.send(ScaleData(it)) }
-                .doOnNext { Utils.saveScaleToLocal(this.applicationContext, it) }
-
-    }
-
-    private fun checkDrawOverlayPermission() {
-
-        if (!Settings.canDrawOverlays(this)) {
-            var intent: Intent? = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + packageName))
-            startActivityForResult(intent, REQUEST_CODE)
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -74,10 +61,9 @@ class MainActivity : AppCompatActivity(), DiscreteSeekBar.OnProgressChangeListen
             // Double-check that the user granted it, and didn't just dismiss the request
             if (Settings.canDrawOverlays(this)) {
 
-                openAccessibilitySettings()
 
-                // Launch the service
-                finishActivity()
+                presenter?.checkEnableAccessibilityService()
+
             } else {
 
                 Toast.makeText(this, "Sorry. Can't draw overlays without permission...", Toast.LENGTH_SHORT).show()
@@ -85,17 +71,9 @@ class MainActivity : AppCompatActivity(), DiscreteSeekBar.OnProgressChangeListen
         }
     }
 
-    private fun openAccessibilitySettings() {
-        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-        startActivity(intent)
-    }
-
-    private fun finishActivity() {
-//        finish()
-    }
 
     override fun onProgressChanged(seekBar: DiscreteSeekBar?, value: Int, fromUser: Boolean) {
-        publishSubject.onNext(value)
+        presenter?.scaleChanged(value)
     }
 
     override fun onStartTrackingTouch(seekBar: DiscreteSeekBar?) {
@@ -104,12 +82,20 @@ class MainActivity : AppCompatActivity(), DiscreteSeekBar.OnProgressChangeListen
     override fun onStopTrackingTouch(seekBar: DiscreteSeekBar?) {
     }
 
+    override fun onResume() {
+        super.onResume()
+        presenter?.checkEnableAccessibilityService()
+    }
+
     override fun onDestroy() {
-        compositSubscription?.clear()
+        presenter?.release()
         super.onDestroy()
     }
 
-
+    //Button Open Accessibility
+    fun clickAccessibility(view: View) {
+        openAccessibility()
+    }
 
 
 }

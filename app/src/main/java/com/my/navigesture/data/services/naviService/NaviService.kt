@@ -1,10 +1,8 @@
-package com.my.navigesture
+package com.my.navigesture.data.services.naviService
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.PixelFormat
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +13,11 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
-import com.my.navigesture.TouchListener.FireEvent
+import com.my.navigesture.*
+import com.my.navigesture.data.services.naviService.TouchListener.FireEvent
+import com.my.navigesture.utils.Constants
+import com.my.navigesture.utils.Utils
+import com.my.navigesture.data.ScaleData
 
 
 class NaviService: AccessibilityService{
@@ -28,29 +30,17 @@ class NaviService: AccessibilityService{
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
 
-    override fun onServiceConnected() {
-        super.onServiceConnected()
-        Toast.makeText(this, packageName + " started", Toast.LENGTH_SHORT).show()
-    }
-
 
     constructor()
 
     override fun onCreate() {
         super.onCreate()
         addOverlayView()
-
-
         Bus.observe<ScaleData>()
                 .subscribe{ resizeContainerHeight(it.getScaleDate()) }
                 .registerInBus(this);
     }
 
-    private fun getDetaulScaleValue(): Int{
-        val sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
-        val scaleData = sharedPreferences.getInt(Constants.SCALE_VALUE, Constants.DEFAULT_HEIGHT)
-        return scaleData
-    }
 
     private fun addOverlayView() {
         val params = WindowManager.LayoutParams(
@@ -97,7 +87,7 @@ class NaviService: AccessibilityService{
             }
         }
 
-        val homeLongSwipeUp = object : TouchListener.LongSwipeUp{
+        val homeLongSwipeUp = object : TouchListener.LongSwipeUp {
             override fun longSwipeUp() {
                 performGlobalAction(GLOBAL_ACTION_RECENTS)
             }
